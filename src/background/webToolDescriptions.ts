@@ -224,6 +224,22 @@ const getWebToolDescriptions = function () {
             }
         },
         {
+            serviceType: 'Kaiten',
+            serviceName: 'Kaiten',
+            icon: 'kaiten.svg',
+            keywords: 'Kaiten description',
+            origins: [
+                'https://*.kaiten.io/*',
+                'https://*.kaiten.com/*',
+                'https://*.kaiten.ru/*',
+                'https://digitalbutlers.kaiten.ru/*'
+            ],
+            hasAdditionalOrigins: true,
+            scripts: {
+                js: ['in-page-scripts/integrations/kaiten.js']
+            }
+        },
+        {
             serviceType: 'Kayako',
             serviceName: 'Kayako',
             icon: 'kayako.svg',
