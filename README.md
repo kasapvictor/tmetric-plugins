@@ -1,3 +1,6 @@
+### Wiki
+https://github.com/DevartSoftware/tmetric-plugins/wiki/How-To:-Add-New-Integration
+
 # TMetric timer extension for major web browsers
 Extension adds TMetric one-click time tracking to popular web tools. Supported
 web browsers are **Chrome**, **Firefox**, **Edge**, **Opera**, and **Safari**.
