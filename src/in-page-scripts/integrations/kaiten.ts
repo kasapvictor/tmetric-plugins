@@ -1,54 +1,83 @@
 class Kaiten implements WebToolIntegration {
-    /**
-     * The array of URLs (with wildcards) that are used to identify
-     * pages as those that belong to the service.
-     */
-    matchUrl = [
-        '*://*.kaiten.*/space/*'
-    ];
+    matchUrl = ['*://*.kaiten.ru/space/*/card/*'];
 
-    /**
-     * If the service may be on a custom domain implement this method
-     * to identify pages of the service by other features (e.g. meta-tags).
-     */
-    match(source: Source) {
-        return $$.getAttribute('meta[name=application-name]', 'content') == 'Kaiten';
-    }
-
-    /**
-     * The identifier of the element, which contains the task details
-     * and inside which the button will be rendered.
-     */
     issueElementSelector = [
-        '.ticket'
+        '#print-source',      // task
+        '[data-test="checklist-item"]' // sub-task
     ];
 
-    /**
-     * Extracts information about the issue (ticket or task) from a Web
-     * page by querying the DOM model.
-     */
     getIssue(issueElement: HTMLElement, source: Source): WebToolIssue {
-        const issueId = $$.try('.ticket-id', issueElement).textContent;
-        const issueName = $$.try('.ticket-name', issueElement).textContent;
+        const root = $$('#print-source');
+        const tagNames = [];
+        const serviceType = 'Kaiten';
         const serviceUrl = source.protocol + source.host;
         const issueUrl = source.path;
-        const projectName = $$.try('.project-name', issueElement).textContent;
-        const tagNames = $$.all('.labels', issueElement).map(label => label.textContent);
-        const serviceType = 'BigIssueTrac'
+        const projectNameTitleEl = $$('h6[title="Project Name"]');
 
-        return { issueId, issueName, issueUrl, projectName, serviceUrl, serviceType, tagNames };
+        let tag = '';
+        let projectName = '';
+        let issueId = $$('[data-test="card-location"] a', root).textContent;
+        let issueName = $$('#print-source p', root).textContent;
+        let description = issueName;
+
+        if (projectNameTitleEl) {
+            const nextSibling = projectNameTitleEl.parentElement.nextElementSibling;
+            const projectLabel = nextSibling.querySelector('.MuiChip-label');
+
+            if (projectLabel) {
+                projectName = projectLabel.textContent;
+            }
+        }
+
+        const cardContent = $$('.cardContent', root);
+        const positionName = cardContent.querySelector('a.MuiLink-root').textContent.toLowerCase();
+
+        if (positionName.includes(' upstream ')) {
+            tag = ' | Estimation';
+        }
+
+        if (positionName.includes(' qc ')) {
+            tag = ' | Testing';
+        }
+
+        if (positionName.includes(' code review ')) {
+            tag = ' | Code review';
+        }
+
+        if (positionName.includes(' rework ')) {
+            tag = ' | Rework';
+        }
+
+        if (issueElement.matches(this.issueElementSelector[1])) {
+            const checkListItem = ' | ' + $$('[role="presentation"] p', issueElement).textContent;
+
+            description += checkListItem;
+            issueName += checkListItem;
+            issueId += checkListItem;
+        }
+
+        description += tag;
+        issueName += tag;
+        issueId += tag;
+
+        return {issueId, issueName, projectName, serviceType, description, serviceUrl, issueUrl, tagNames};
     }
 
-    /**
-     * Inserts the timer button for the identified issue into a Web page.
-     */
     render(issueElement: HTMLElement, linkElement: HTMLElement) {
-        const host = $$('.link-list', issueElement);
+        if (issueElement.matches(this.issueElementSelector[0])) {
+            const linkContainer = $$.create('div', 'devart-timer-link-kaiten');
+            const cardContent = $$('.cardContent', issueElement);
 
-        if (host) {
-            const container = $$.create('li');
-            container.appendChild(linkElement);
-            host.appendChild(container);
+            linkContainer.appendChild(linkElement);
+
+            if (cardContent) {
+                cardContent.prepend(linkContainer);
+            }
+        }
+
+        if (issueElement.matches(this.issueElementSelector[1])) {
+            linkElement.classList.add('devart-timer-link-minimal', 'devart-timer-link-kaiten-subtask');
+            issueElement.prepend(linkElement);
         }
     }
 }

@@ -3,6 +3,8 @@
 @border-width: 0.1em;
 @color: #444;
 @color-light: lighten(@color, 50%);
+@color-gray9: #999999;
+@color-gray8: #888888;
 @margin: 0.5em;
 @margin-double: @margin * 2;
 @padding: 0.5em;
@@ -120,6 +122,8 @@ body {
 
 .container {
     width: @body-width;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 header {
@@ -1104,4 +1108,30 @@ content.creating {
             color: @active-color;
         }
     }
+}
+
+/* NOTICE */
+.with-notice {
+    position: relative;
+}
+
+.notice {
+    display: none; // flex
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    position: absolute;
+    font-size: 14px;
+    top: 0;
+    bottom: 0;
+    left: 64px;
+    width: 322px;
+    color: @error-color;
+    background-color: @error-background-color;
+    border-radius: 4px;
+}
+
+#start:disabled {
+    background-color: @color-gray9;
+    border-color: @color-gray8;
 }

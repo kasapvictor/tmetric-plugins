@@ -137,7 +137,7 @@ function stripDebugCommon(folder) {
     ], {
         base: folder
     })
-        .pipe(stripDebug())
+        // .pipe(stripDebug())
         .pipe(gulp.dest(folder));
 }
 
