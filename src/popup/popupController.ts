@@ -26,7 +26,7 @@ class PopupController {
 
         this.switchState(this._states.loading);
 
-        return this.initializeAction({ accountId, includeRecentTasks: !this.isPagePopup }).then(data => {
+        return this.initializeAction({accountId, includeRecentTasks: !this.isPagePopup}).then(data => {
             this.setData(data);
 
             if (this._profile.accountMembership.length > 1) {
@@ -91,7 +91,7 @@ class PopupController {
     }
 
     putTimer(accountId: number, timer: WebToolIssueTimer) {
-        return this.putTimerAction({ accountId, timer }).then(() => {
+        return this.putTimerAction({accountId, timer}).then(() => {
             this.close();
         });
     }
@@ -116,8 +116,7 @@ class PopupController {
         return (data?: TData) => {
             return new Promise<TResult>((resolve, reject) => {
                 this.callBackground({
-                    action: action,
-                    data: data
+                    action: action, data: data
                 }).then(response => {
                     if (response.error) {
                         reject(response.error);
@@ -147,10 +146,7 @@ class PopupController {
     // ui mutations
 
     private _forms = {
-        login: '#login-form',
-        fix: '#fix-form',
-        view: '#view-form',
-        create: '#create-form'
+        login: '#login-form', fix: '#fix-form', view: '#view-form', create: '#create-form'
     };
 
     private _states = {
@@ -278,7 +274,7 @@ class PopupController {
             url = `${this._constants.serviceUrl}#/tasks/${this._accountId}/${issueId}`;
         }
 
-        return { url, text };
+        return {url, text};
     }
 
     fillWebToolAlert() {
@@ -323,7 +319,7 @@ class PopupController {
 
         const projectTask = details.projectTask;
 
-        const { url, text } = this.getTaskLinkData(projectTask);
+        const {url, text} = this.getTaskLinkData(projectTask);
 
         if (url) {
 
@@ -378,7 +374,7 @@ class PopupController {
 
         const issue = this._newIssue;
 
-        const { url, text } = this.getTaskLinkData(issue);
+        const {url, text} = this.getTaskLinkData(issue);
 
         if (url) {
             this.fillTaskLink(task.find('.link'), url, text);
@@ -437,8 +433,7 @@ class PopupController {
 
             if (this._recentTasks && this._recentTasks.length) {
                 toggle.prop('disabled', false);
-                const items = this._recentTasks.map((task, index) =>
-                    this.formatRecentTaskSelectorItem(task, index));
+                const items = this._recentTasks.map((task, index) => this.formatRecentTaskSelectorItem(task, index));
                 menu.append(items);
             }
         });
@@ -654,15 +649,13 @@ class PopupController {
         return container;
     }
 
-    private noProjectOption: IdTextPair = { id: 0, text: 'No project' };
+    private noProjectOption: IdTextPair = {id: 0, text: 'No project'};
 
-    private createProjectOption: IdTextPair = { id: -1, text: 'New project' };
+    private createProjectOption: IdTextPair = {id: -1, text: 'New project'};
 
     makeTagItem(name: string, isWorkType?: boolean) {
         return <IdTextTagType>{
-            id: name,
-            text: name,
-            isWorkType: !!isWorkType
+            id: name, text: name, isWorkType: !!isWorkType
         };
     }
 
@@ -723,7 +716,7 @@ class PopupController {
             if (newProjectName && project.projectName.toLowerCase() == newProjectName.toLowerCase()) {
                 existingProjectId = project.projectId;
             }
-            return <IdTextPair>{ id: project.projectId, text: project.projectName + projectCode + projectClient };
+            return <IdTextPair>{id: project.projectId, text: project.projectName + projectCode + projectClient};
         }));
 
         if (!defaultProjectId) {
@@ -896,10 +889,8 @@ class PopupController {
                     const isTermIncluded = text.length >= term.length && text.indexOf(term) > -1;
                     const isEqual = text == term;
 
-                    if (
-                        (isSelected && isEqual) || // match selected option to avoid message about not found option during input
-                        (!isSelected && isTermIncluded)
-                    ) {
+                    if ((isSelected && isEqual) || // match selected option to avoid message about not found option during input
+                        (!isSelected && isTermIncluded)) {
                         return option;
                     }
 
@@ -993,6 +984,16 @@ class PopupController {
         }
 
         return $(this._forms.create + ' .error').length == 0;
+    }
+
+    private isExistingProject() {
+        const projectsList = this._projects;
+        const currentProjectName = this._newIssue.projectName || '';
+        const isDigitalButlersKaiten = location.ancestorOrigins[0].includes('digitalbutlers');
+
+        $(this._forms.create + ' .error').removeClass('error');
+
+        return Boolean(projectsList.find((project) => project.projectName === currentProjectName)) && isDigitalButlersKaiten;
     }
 
     // ui event handlers
@@ -1104,12 +1105,34 @@ class PopupController {
     private onProjectSelectChange() {
         const newProjectContainer = $(this._forms.create + ' .new-project');
         const newProjectInput = $('.input', newProjectContainer);
+        const noticeWrapper = $('.with-notice');
+        const notice = $('.with-notice .notice');
+        const noticeContent = $('.with-notice .notice-content');
+        const startButton = $('#start', this._forms.create);
+        const isDigitalButlersKaiten = location.ancestorOrigins[0].includes('digitalbutlers');
+
+        if (!this._newIssue.projectName && isDigitalButlersKaiten) {
+            noticeWrapper.addClass('active');
+            notice.css('display', 'flex');
+            noticeContent.html("Please add project name to the Kaiten card!");
+            startButton.attr("disabled", "true");
+        }
 
         const value = parseInt($(this._forms.create + ' .project .input').val());
         if (value == -1) { // create new project option
             const issueProjectName = (this._newIssue.projectName) || '';
             newProjectInput.val(issueProjectName);
-            newProjectContainer.css('display', 'block');
+
+            if (!isDigitalButlersKaiten) {
+                newProjectContainer.css('display', 'block');
+            }
+
+            if (isDigitalButlersKaiten) {
+                noticeWrapper.addClass('active');
+                notice.css('display', 'flex');
+                noticeContent.html("Project names in Kaiten and Tmetric don\'t match. <br/> Please make them equal!");
+                startButton.attr("disabled", "true");
+            }
         } else {
             newProjectContainer.css('display', 'none');
         }
@@ -1186,6 +1209,10 @@ class PopupController {
         const selectedProject = <Select2SelectionObject>$(this._forms.create + ' .project .input').select2('data')[0];
         const selectedProjectId = Number(selectedProject.id);
 
+        if (!this._newIssue.projectName) {
+            return;
+        }
+
         if (!selectedProject || !selectedProject.selected || !selectedProjectId) {
             timer.projectName = ''; // No project
         } else if (selectedProjectId > 0) {
@@ -1201,7 +1228,7 @@ class PopupController {
         timer.description = $(this._forms.create + ' .description .input').val();
         timer.tagNames = $(this._forms.create + ' .tags .input').select().val() || [];
 
-        if (!this.checkRequiredFields(timer)) {
+        if (!this.checkRequiredFields(timer) || !this.isExistingProject()) {
             return;
         }
 
@@ -1217,23 +1244,22 @@ class PopupController {
             const existingProject = existingProjects.find(p => p.projectId == timer.projectId) || existingProjects[0];
 
             if (newProjectName == projectName && existingProjects.length < 2) {
-                this.saveProjectMapAction({ accountId, projectName, projectId: null });
+                this.saveProjectMapAction({accountId, projectName, projectId: null});
             } else if (existingProject) {
-                this.saveProjectMapAction({ accountId, projectName, projectId: existingProject.projectId });
+                this.saveProjectMapAction({accountId, projectName, projectId: existingProject.projectId});
             }
 
             if (timer.issueId && timer.description != this._newIssue.description) {
                 // Save description map
                 this.saveDescriptionMapAction({
-                    taskName: this._newIssue.issueName,
-                    description: timer.description
+                    taskName: this._newIssue.issueName, description: timer.description
                 });
             }
         });
     }
 
     private onStopClick() {
-        this.putTimer(this._profile.activeAccountId, { isStarted: false });
+        this.putTimer(this._profile.activeAccountId, {isStarted: false});
     }
 
     private onCreateClick() {

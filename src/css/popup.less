@@ -1115,23 +1115,29 @@ content.creating {
     position: relative;
 }
 
+.with-notice.active .tags,
+.with-notice.active .project,
+.with-notice.active .new-project{
+    display: none;
+}
+
 .notice {
     display: none; // flex
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
+    gap: 10px;
     text-align: center;
-    padding: 10px;
-    position: absolute;
+    padding: 20px;
     font-size: 14px;
-    top: 0;
-    bottom: 0;
-    left: 64px;
-    width: 322px;
     color: @error-color;
     background-color: @error-background-color;
     border-radius: 4px;
+    box-sizing: border-box;
 }
 
 #start:disabled {
     background-color: @color-gray9;
     border-color: @color-gray8;
 }
+
