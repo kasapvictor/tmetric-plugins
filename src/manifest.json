@@ -1,11 +1,11 @@
 {
   "manifest_version": 2,
 
-  "name": "DigitalButlers-TMetric",
-  "short_name": "DigitalButlers-TMetric",
-  "description": "DigitalButlers-TMetric",
-  "author": "DigitalButlers",
-  "version": "0.1.4",
+  "name": "TMetric – Time Tracker & Productivity App by DigitalButlers",
+  "short_name": "TMetric (DigitalButlers)",
+  "description": "Simple time tracking extension which helps you be more productive, complete projects in time and bill your clients correctly.",
+  "author": "Devart",
+  "version": "4.5.7",
 
   "icons": {
     "16": "images/icon16.png",

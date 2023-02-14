@@ -996,8 +996,9 @@ class PopupController {
     }
 
     private isDigitalButlersKaiten () {
-        const locationAncestor = location.ancestorOrigins[0];
-        return locationAncestor && locationAncestor.includes('digitalbutlers');
+        const location = $('[data-link="task"]')[0] as HTMLAnchorElement;
+
+        return location && location.href.includes('digitalbutlers');
     }
 
     // ui event handlers
