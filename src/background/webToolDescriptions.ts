@@ -232,7 +232,6 @@ const getWebToolDescriptions = function () {
                 'https://*.kaiten.io/*',
                 'https://*.kaiten.com/*',
                 'https://*.kaiten.ru/*',
-                'https://digitalbutlers.kaiten.ru/*'
             ],
             hasAdditionalOrigins: true,
             scripts: {

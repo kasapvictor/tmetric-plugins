@@ -989,11 +989,15 @@ class PopupController {
     private isExistingProject() {
         const projectsList = this._projects;
         const currentProjectName = this._newIssue.projectName || '';
-        const isDigitalButlersKaiten = location.ancestorOrigins[0].includes('digitalbutlers');
 
         $(this._forms.create + ' .error').removeClass('error');
 
-        return Boolean(projectsList.find((project) => project.projectName === currentProjectName)) && isDigitalButlersKaiten;
+        return Boolean(projectsList.find((project) => project.projectName === currentProjectName));
+    }
+
+    private isDigitalButlersKaiten () {
+        const locationAncestor = location.ancestorOrigins[0];
+        return locationAncestor && locationAncestor.includes('digitalbutlers');
     }
 
     // ui event handlers
@@ -1106,12 +1110,11 @@ class PopupController {
         const newProjectContainer = $(this._forms.create + ' .new-project');
         const newProjectInput = $('.input', newProjectContainer);
         const noticeWrapper = $('.with-notice');
-        const notice = $('.with-notice .notice');
-        const noticeContent = $('.with-notice .notice-content');
+        const notice = $('.notice', noticeWrapper);
+        const noticeContent = $('.notice-content', noticeWrapper);
         const startButton = $('#start', this._forms.create);
-        const isDigitalButlersKaiten = location.ancestorOrigins[0].includes('digitalbutlers');
 
-        if (!this._newIssue.projectName && isDigitalButlersKaiten) {
+        if (!this._newIssue.projectName && this.isDigitalButlersKaiten()) {
             noticeWrapper.addClass('active');
             notice.css('display', 'flex');
             noticeContent.html("Please add project name to the Kaiten card!");
@@ -1119,15 +1122,16 @@ class PopupController {
         }
 
         const value = parseInt($(this._forms.create + ' .project .input').val());
+
         if (value == -1) { // create new project option
             const issueProjectName = (this._newIssue.projectName) || '';
             newProjectInput.val(issueProjectName);
 
-            if (!isDigitalButlersKaiten) {
+            if (!this.isDigitalButlersKaiten()) {
                 newProjectContainer.css('display', 'block');
             }
 
-            if (isDigitalButlersKaiten) {
+            if (this.isDigitalButlersKaiten()) {
                 noticeWrapper.addClass('active');
                 notice.css('display', 'flex');
                 noticeContent.html("Project names in Kaiten and Tmetric don\'t match. <br/> Please make them equal!");
@@ -1201,7 +1205,6 @@ class PopupController {
     }
 
     private onStartClick() {
-
         // Clone issue
         const timer = Object.assign({}, this._newIssue);
 
@@ -1228,7 +1231,8 @@ class PopupController {
         timer.description = $(this._forms.create + ' .description .input').val();
         timer.tagNames = $(this._forms.create + ' .tags .input').select().val() || [];
 
-        if (!this.checkRequiredFields(timer) || !this.isExistingProject()) {
+
+        if (!this.checkRequiredFields(timer) || (this.isDigitalButlersKaiten() && !this.isExistingProject())) {
             return;
         }
 
